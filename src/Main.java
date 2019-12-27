@@ -7,6 +7,10 @@ public class Main {
     public static List<String> configline_tartamizer (String input){
         // har xat voroodi az jens e configline ro tartamiz mikone be form e [+,a,b,c,...]
         input = input.trim();
+        // to remove whitespaces between question mark and optional features
+        String pattern = "([?])(\\s+)(\\w)";
+        input = input.replaceAll(pattern, "$1$3");
+
         String[] token = input.split("\\s+");
         List<String> result = new ArrayList<String>();
         String neshangar = "";
@@ -23,7 +27,11 @@ public class Main {
                 result.add(token[i]);
             }
         }
-        result.add(0, neshangar);
+
+        if (neshangar != ""){ result.add(0, neshangar); }
+        // to handle a configline like: b = c
+        else { result.add(0, "+"); }
+
         return result;
     }
 
@@ -37,51 +45,54 @@ public class Main {
         return result;
     }
 
-    public static void implement_configline (Tree tree, List<String> tartamized_configline){
-        Feature this_parent = new Feature(tartamized_configline.get(1), null);
-
-        //looping through the first input line
-        for (int i=2; i<tartamized_configline.size(); i++){
-            if (tartamized_configline.get(0).equals("+")){
-                if (tartamized_configline.get(i).charAt(0) == '?'){
-
-                }
-                else {
-
-                }
-
-            }
-            else if (tartamized_configline.get(0).equals("^")){
-
-            }
-            else if (tartamized_configline.get(0).equals("|")){
-
-            }
-        }
-
-    }
-
     public static void main(String[] args) {
+        Tree tree = new Tree();
 
         Scanner input = new Scanner(System.in);
-//        String line = input.nextLine();
+        String line = input.nextLine();
+        while (! line.equals("#")){
+            System.out.println(configline_tartamizer(line));
+            tree.implement(configline_tartamizer(line));
+            tree.showData();
+            for (Feature a: tree.getAllFeatures()){
+                System.out.print(a.getName() + " ");
+            }
+            System.out.println();
+            line = input.nextLine();
+        }
 
-//        implement_configline(tree, configline_tartamizer(line));
-        //        while(!configline.equals("#")){
-//
+//                while(!configline.equals("#")){
+
 //        }
+        /*
+        * the tree is:
+        *
+        * a
+        * | \
+        * |  \
+        * b   c
+        * |\
+        * d e
+        *   fgh
+        *
+        *
+k        *  */
+//        Feature A = new Feature("A", null, null, null, null);
+//        Feature B = new Feature("B", null, AsChildAttr.OPTIONAL, AsParentAttr.OR, null);
+//        Feature C = new Feature("C", null, AsChildAttr.OPTIONAL, null, null);
+//        Feature D = new Feature("D", null, null, null, null);
+//        Feature E = new Feature("E", null, null, null, null);
+//        Feature F = new Feature("F", E, null, null, null);
+//        Feature G = new Feature("G", E, null, null, null);
+//        Feature H = new Feature("H", E, null, null, null);
+//        tree.setRoot(A);
+//        A.addChild(B);
+//        E.addChild(F);
+//        E.addChild(G);
+//        B.addChild(D);
+//        E.addChild(H);
+//        A.addChild(C);
+//        B.addChild(E);
 
-        Tree tree = new Tree();
-        Feature A = new Feature("A", null, null, null, null);
-        Feature B = new Feature("B", null, AsChildAttr.OPTIONAL, AsParentAttr.OR, null);
-        Feature C = new Feature("C", null, AsChildAttr.OPTIONAL, null, null);
-        Feature D = new Feature("D", null, null, null, null);
-        Feature E = new Feature("E", null, null, null, null);
-        tree.setRoot(A);
-        A.addChild(B);
-        A.addChild(C);
-        B.addChild(D);
-        B.addChild(E);
-        tree.showData();
     }
 }

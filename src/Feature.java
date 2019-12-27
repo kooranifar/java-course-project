@@ -23,7 +23,13 @@ public class Feature {
         this.Name = Name;
         this.AsChildAttr = AsChildattr;
         this.AsParentAttr = AsParentAttr;
-        this.Children =  new ArrayList<Feature>();
+        if (Children != null){
+            this.Children =  Children;
+        }
+        else {
+            this.Children =  new ArrayList<Feature>();
+        }
+
     }
 
     public String getName(){ return this.Name;}
