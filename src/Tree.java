@@ -10,17 +10,22 @@ public class Tree {
 
     public List<Feature> getAllFeatures() { return AllFeatures; }
 
-    public void setRoot(Feature root){
-        this.root = root;
-        System.out.println("now the root is: " + root.getName());
-
+    public void setRoot(){ // important. be sure not to be forgotten to be set.
+        for (Feature feature: this.getAllFeatures()){
+            if (feature.getParent() == null) {
+                this.root = feature;
+                System.out.println("Root is feature " + feature.getName());
+                return;
+            }
+        }
     }
+
     public Feature getRoot() { return root; }
 
     private void addFeature(Feature feature){ this.AllFeatures.add(feature); }
 
     // flattens our tree to be able too traverse it.
-    private List<Feature> flattenBreadthFirst() {
+    public List<Feature> flattenBreadthFirst() {
 //        System.out.println("flattenBreadthFirst is called");
         List list = new ArrayList<Feature>();
         Queue<Feature> queue = new LinkedList<Feature>();
@@ -56,7 +61,7 @@ public class Tree {
             for (Feature child : feature.getChildren()){
                 System.out.print(child.getName() + " ");
             }
-            System.out.println(feature.getChildren().size());
+            System.out.println();
             if (feature.getAsChildAttr()  != null){ System.out.println("childattr: "  + feature.getAsChildAttr().name);}
             if (feature.getAsParentAttr() != null){ System.out.println("parentattr: " + feature.getAsParentAttr().name);}
             System.out.println("\n");
@@ -121,5 +126,69 @@ public class Tree {
                 this_parent.addChild(this_child);
             }
         }
+    }
+
+    public boolean isValid(List<String> model){
+        // root must be included.
+        if (! model.contains(this.root.getName())) {
+            System.out.println("root is missed");
+            return false;
+        }
+        for (int i=0; i<model.size(); i++){
+            Feature this_feature = traverseTo(model.get(i));
+
+            // parent of each feature should exist.
+            if (! this_feature.equals(this.root)){
+                if (! model.contains(this_feature.getParent().getName())) {
+                    System.out.println("parent of " + this_feature.getName() + " is missed");
+                    return false;
+                }
+            }
+
+            // OR and XOR
+            if (this_feature.getAsParentAttr() == AsParentAttr.OR){
+                int incident_count = 0;
+                for (Feature child : this_feature.getChildren()){
+                    if (model.contains(child.getName()))
+                        incident_count++;
+                }
+                if (incident_count < 1) {
+                    System.out.println("OR error for "
+                            + this_feature.getName()
+                            + " - number of incidents: "
+                            + incident_count);
+                    return false;
+                }
+            }
+
+            if (this_feature.getAsParentAttr() == AsParentAttr.XOR){
+                int incident_count = 0;
+                for (Feature child : this_feature.getChildren()){
+                    if (model.contains(child.getName()))
+                        incident_count++;
+                }
+                if (incident_count != 1) {
+                    System.out.println("XOR error for "
+                            + this_feature.getName()
+                            + " - number of incidents: "
+                            + incident_count);
+                    return false;
+                }
+            }
+
+            // Mandatory children of an existing method should be in the model.
+            for (Feature child: this_feature.getChildren()){
+                if (child.getAsChildAttr() == AsChildAttr.MANDATORY){
+                    if (! model.contains(child.getName())){
+                        System.out.println("mandatory child "
+                                + child.getName()
+                                + " is missed for "
+                                + this_feature.getName());
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 }

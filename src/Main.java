@@ -37,9 +37,8 @@ public class Main {
 
     public static List<String> testcase_tartamizer (String input){
         // har xat voroodi az jens e configline ro tartamiz mikone be form e [+,a,b,c,...]
-        input = input.replaceAll("[{}]", "");
-        input = input.replace(',', ' ');
-        input.trim();
+        input = input.replaceAll("[{,}]", " ");
+        input = input.trim();
         String[] token = input.split("\\s+");
         List<String> result = Arrays.asList(token);
         return result;
@@ -51,48 +50,28 @@ public class Main {
         Scanner input = new Scanner(System.in);
         String line = input.nextLine();
         while (! line.equals("#")){
-            System.out.println(configline_tartamizer(line));
             tree.implement(configline_tartamizer(line));
-            tree.showData();
-            for (Feature a: tree.getAllFeatures()){
-                System.out.print(a.getName() + " ");
-            }
-            System.out.println();
             line = input.nextLine();
         }
+        for (Feature a: tree.getAllFeatures()){
+            System.out.print(a.getName() + " ");
+        }
+        System.out.println();
+        tree.showData();
 
-//                while(!configline.equals("#")){
+        // among the most important lines of my code i'd like to honor:
+        tree.setRoot();
 
-//        }
-        /*
-        * the tree is:
-        *
-        * a
-        * | \
-        * |  \
-        * b   c
-        * |\
-        * d e
-        *   fgh
-        *
-        *
-k        *  */
-//        Feature A = new Feature("A", null, null, null, null);
-//        Feature B = new Feature("B", null, AsChildAttr.OPTIONAL, AsParentAttr.OR, null);
-//        Feature C = new Feature("C", null, AsChildAttr.OPTIONAL, null, null);
-//        Feature D = new Feature("D", null, null, null, null);
-//        Feature E = new Feature("E", null, null, null, null);
-//        Feature F = new Feature("F", E, null, null, null);
-//        Feature G = new Feature("G", E, null, null, null);
-//        Feature H = new Feature("H", E, null, null, null);
-//        tree.setRoot(A);
-//        A.addChild(B);
-//        E.addChild(F);
-//        E.addChild(G);
-//        B.addChild(D);
-//        E.addChild(H);
-//        A.addChild(C);
-//        B.addChild(E);
+        line = input.nextLine();
+        while (! line.equals("##")){
+            if (tree.isValid(testcase_tartamizer(line))){
+                System.out.println("Valid");
+            }
+            else {
+                System.out.println("Invalid");
+            }
+            line = input.nextLine();
+        }
 
     }
 }
