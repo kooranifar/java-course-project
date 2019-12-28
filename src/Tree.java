@@ -72,7 +72,9 @@ public class Tree {
     public void implement (List<String> configline) {
         String this_parent_name = configline.get(1);
         Feature this_parent;
-        if (traverseTo(this_parent_name) != null) {this_parent = traverseTo(this_parent_name);}
+        Feature traverse_result; // just to save memory! as you said.
+        traverse_result = traverseTo(this_parent_name);
+        if (traverse_result != null) {this_parent = traverse_result;}
         else { // generate this new feature.
             this_parent = new Feature(this_parent_name, null);
             this.addFeature(this_parent);
@@ -98,12 +100,13 @@ public class Tree {
                 else
                     this_child_name = configline.get(i);
 
-                if (traverseTo(this_child_name) == null){
+                traverse_result = traverseTo(this_child_name);
+                if (traverse_result == null){
                     this_child = new Feature(this_child_name, traverseTo(configline.get(1)));
                     this.addFeature(this_child);
                 }
                 else {
-                    this_child = traverseTo(this_child_name);
+                    this_child = traverse_result;
                     this_child.setParent(this_parent);
                 }
                 this_child.setAsChildAttr(
@@ -115,12 +118,13 @@ public class Tree {
             this_parent.setAsParentAttr(configline.get(0).equals("|") ? AsParentAttr.OR : AsParentAttr.XOR);
             for (int i = 2; i < configline.size() ; i++) {
                 Feature this_child;
-                if (traverseTo(configline.get(i)) == null){
+                traverse_result = traverseTo(configline.get(i));
+                if (traverse_result == null){
                     this_child = new Feature(configline.get(i), traverseTo(configline.get(1)));
                     this.addFeature(this_child);
                 }
                 else {
-                    this_child = traverseTo(configline.get(i));
+                    this_child = traverse_result;
                     this_child.setParent(this_parent);
                 }
                 this_parent.addChild(this_child);
@@ -128,11 +132,11 @@ public class Tree {
         }
     }
 
-    public boolean isValid(List<String> model){
+    public String isValid(List<String> model){
         // root must be included.
         if (! model.contains(this.root.getName())) {
-            System.out.println("root is missed");
-            return false;
+            return ("Invalid: root is missed");
+//            return false;
         }
         for (int i=0; i<model.size(); i++){
             Feature this_feature = traverseTo(model.get(i));
@@ -140,8 +144,8 @@ public class Tree {
             // parent of each feature should exist.
             if (! this_feature.equals(this.root)){
                 if (! model.contains(this_feature.getParent().getName())) {
-                    System.out.println("parent of " + this_feature.getName() + " is missed");
-                    return false;
+                    return ("Invalid: parent of " + this_feature.getName() + " is missed");
+//                    return false;
                 }
             }
 
@@ -153,11 +157,11 @@ public class Tree {
                         incident_count++;
                 }
                 if (incident_count < 1) {
-                    System.out.println("OR error for "
+                    return ("Invalid: OR error for "
                             + this_feature.getName()
                             + " - number of incidents: "
                             + incident_count);
-                    return false;
+//                    return false;
                 }
             }
 
@@ -168,11 +172,11 @@ public class Tree {
                         incident_count++;
                 }
                 if (incident_count != 1) {
-                    System.out.println("XOR error for "
+                    return("Invalid: XOR error for "
                             + this_feature.getName()
-                            + " - number of incidents: "
+                            + " - number of incident is: "
                             + incident_count);
-                    return false;
+//                    return false;
                 }
             }
 
@@ -180,15 +184,15 @@ public class Tree {
             for (Feature child: this_feature.getChildren()){
                 if (child.getAsChildAttr() == AsChildAttr.MANDATORY){
                     if (! model.contains(child.getName())){
-                        System.out.println("mandatory child "
+                        return("Invalid: mandatory child "
                                 + child.getName()
                                 + " is missed for "
                                 + this_feature.getName());
-                        return false;
+//                        return false;
                     }
                 }
             }
         }
-        return true;
+        return("Valid");
     }
 }

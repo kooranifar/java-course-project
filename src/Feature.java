@@ -18,19 +18,6 @@ public class Feature {
         this.Children =  new ArrayList<Feature>();
     }
 
-    Feature(String Name, Feature Parent, AsChildAttr AsChildattr, AsParentAttr AsParentAttr, List<Feature> Children){
-        this.Parent = Parent;
-        this.Name = Name;
-        this.AsChildAttr = AsChildattr;
-        this.AsParentAttr = AsParentAttr;
-        if (Children != null){
-            this.Children =  Children;
-        }
-        else {
-            this.Children =  new ArrayList<Feature>();
-        }
-
-    }
 
     public String getName(){ return this.Name;}
 
